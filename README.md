@@ -23,3 +23,8 @@ cargo fmt -- --check
 cargo install cargo-audit
 cargo audit
 ```
+
+### CI
+This project uses github actions for CI
+- Jobs run automatically on push and PRs
+- Must give `GITHUB_TOKEN` read and write permissions
