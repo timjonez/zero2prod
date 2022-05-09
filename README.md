@@ -28,3 +28,12 @@ cargo audit
 This project uses github actions for CI
 - Jobs run automatically on push and PRs
 - Must give `GITHUB_TOKEN` read and write permissions
+
+# Tools
+### Cargo Expand
+Install
+- `cargo install cargo-expand`
+- Needs to use the nightly build `rustup toolchain install nightly --allow-downgrade`
+
+Run
+- `cargo +nightly expand`
