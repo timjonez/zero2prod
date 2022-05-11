@@ -37,3 +37,14 @@ Install
 
 Run
 - `cargo +nightly expand`
+
+# Database
+Set env variable
+- `export DATABASE_URL=postgres://postgres:password@127.0.0.1:5432/newsletter`
+Create DB in Docker
+- `./scripts/init_db.sh`
+Add Table
+- `sqlx migrate add table_name`
+Run migrations
+- `sqlx migrate run`
+
