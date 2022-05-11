@@ -1,5 +1,4 @@
 use actix_web::{web, HttpResponse};
-use chrono::Utc;
 use sqlx::PgPool;
 use uuid::Uuid;
 
@@ -12,13 +11,12 @@ pub struct SubscribeForm {
 pub async fn subscribe(form: web::Form<SubscribeForm>, pool: web::Data<PgPool>) -> HttpResponse {
     match sqlx::query!(
         r#"
-        INSERT INTO subscriptions (id, email, name, subscribed_at)
-        VALUES ($1, $2, $3, $4)
+        INSERT INTO subscriptions (id, email, name)
+        VALUES ($1, $2, $3)
         "#,
         Uuid::new_v4(),
         form.email,
-        form.name,
-        Utc::now()
+        form.name
     )
     .execute(pool.get_ref())
     .await
