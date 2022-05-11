@@ -61,7 +61,7 @@ jobs:
             --no-default-features
             --locked
       - name: Migrate database
-        run:
+        run: |
           sudo apt-get install libpq-dev -y
           SKIP_DOCKER=true ./scripts/init_db.sh
       - name: Run cargo test
@@ -131,7 +131,7 @@ jobs:
             --no-default-features
             --locked
       - name: Migrate database
-        run:
+        run: |
           sudo apt-get install libpq-dev -y
           SKIP_DOCKER=true ./scripts/init_db.sh
       - name: Run clippy
@@ -186,7 +186,7 @@ jobs:
             --no-default-features
             --locked
       - name: Migrate database
-        run:
+        run: |
           sudo apt-get install libpq-dev -y
           SKIP_DOCKER=true ./scripts/init_db.sh
       - name: Run cargo-tarpaulin
