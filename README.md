@@ -38,13 +38,34 @@ Install
 Run
 - `cargo +nightly expand`
 
+### Cargo Unused Dependencies
+Install
+- `cargo install cargo-udeps`
+
+Run
+- `cargo +nightly udeps`
+
+### Log Formatting
+```
+cargo install bunyan
+cargo run | bunyan
+```
+
 # Database
 Set env variable
 - `export DATABASE_URL=postgres://postgres:password@127.0.0.1:5432/newsletter`
+
 Create DB in Docker
 - `./scripts/init_db.sh`
+
 Add Table
 - `sqlx migrate add table_name`
+
 Run migrations
 - `sqlx migrate run`
 
+# Testing
+```
+cargo test // logs are hidden
+RUST_LOG=true cargo test | bunyan
+```
