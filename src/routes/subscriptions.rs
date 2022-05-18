@@ -9,10 +9,14 @@ pub struct SubscribeForm {
     name: String,
 }
 
-pub fn parse_subscriber(form: SubscribeForm) -> Result<NewSubscriber, String> {
-    let email = SubscriberEmail::parse(form.email)?;
-    let name = SubscriberName::parse(form.name)?;
-    Ok(NewSubscriber { email, name })
+impl TryFrom<SubscribeForm> for NewSubscriber {
+    type Error = String;
+
+    fn try_from(value: SubscribeForm) -> Result<Self, Self::Error> {
+        let name = SubscriberName::parse(value.name)?;
+        let email = SubscriberEmail::parse(value.email)?;
+        Ok(Self { email, name })
+    }
 }
 
 #[tracing::instrument(
@@ -24,8 +28,8 @@ pub fn parse_subscriber(form: SubscribeForm) -> Result<NewSubscriber, String> {
     )
 )]
 pub async fn subscribe(form: web::Form<SubscribeForm>, pool: web::Data<PgPool>) -> HttpResponse {
-    let new_subscriber =  match parse_subscriber(form.0) {
-        Ok(subscriber) => subscriber,
+    let new_subscriber =  match form.0.try_into() {
+        Ok(form) => form,
         Err(_) => return HttpResponse::BadRequest().finish(),
     };
     match insert_subscriber(&pool, &new_subscriber).await {
