@@ -99,6 +99,33 @@ async fn subscribe_returns_200_valid_data() {
 }
 
 #[tokio::test]
+async fn subscribe_returns_400_fields_present_but_empty() {
+    let app = spawn_app().await;
+    let client = reqwest::Client::new();
+    let test_cases = vec![
+        ("name=&email=test%40test.com", "empty name"),
+        ("name=Test&email=", "empty email"),
+        ("name=Test&email=not-a-email", "invalid email"),
+    ];
+
+    for (body, desc) in test_cases {
+        let response = client
+            .post(&format!("{}/subscriptions/", &app.address))
+            .header("Content-Type", "application/x-www-form-urlencoded")
+            .body(body)
+            .send()
+            .await
+            .expect("Failed to execute request");
+        assert_eq!(
+            400,
+            response.status().as_u16(),
+            "the API did not return a 400 when the payload was {}",
+            desc
+        );
+    }
+}
+
+#[tokio::test]
 async fn subscribe_returns_400_invalid_data() {
     let config = spawn_app().await;
     let client = reqwest::Client::new();
