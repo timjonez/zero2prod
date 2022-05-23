@@ -12,11 +12,17 @@ impl EmailClient {
         Self {
             http_client: Client::new(),
             base_url,
-            sender
+            sender,
         }
     }
 
-    pub async fn send_email(&self, recipient: SubscriberEmail, subject: &str, html_content: &str, text_content: &str) -> Result<(), String> {
+    pub async fn send_email(
+        &self,
+        recipient: SubscriberEmail,
+        subject: &str,
+        html_content: &str,
+        text_content: &str,
+    ) -> Result<(), String> {
         todo!()
     }
 }
