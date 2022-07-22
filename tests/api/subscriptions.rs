@@ -64,3 +64,18 @@ async fn subscribe_returns_400_invalid_data() {
         );
     }
 }
+
+#[tokio::test]
+async fn subscribe_sends_confirmation_email() {
+    let app = spawn_app().await;
+    let body = "name=test&email=test%40test.com";
+
+    Mock::given(path("/email"))
+        .and(method("POST"))
+        .respond_with(ResponseTemplate::new(200))
+        .expect(1)
+        .mount(&app.email_server)
+        .await;
+
+    app.post_subscriptions(body.into()).await;
+}
