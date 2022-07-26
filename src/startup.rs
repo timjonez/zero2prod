@@ -1,13 +1,13 @@
+use crate::configuration::DatabaseSettings;
+use crate::configuration::Settings;
 use crate::email_client::EmailClient;
 use crate::routes::{health_check, subscribe};
 use actix_web::dev::Server;
 use actix_web::{web, App, HttpServer};
+use sqlx::postgres::PgPoolOptions;
 use sqlx::PgPool;
 use std::net::TcpListener;
 use tracing_actix_web::TracingLogger;
-use crate::configuration::Settings;
-use sqlx::postgres::PgPoolOptions;
-use crate::configuration::DatabaseSettings;
 
 pub fn get_connection_pool(config: &DatabaseSettings) -> PgPool {
     PgPoolOptions::new()
@@ -38,15 +38,14 @@ impl Application {
 
         let address = format!(
             "{}:{}",
-            configuration.application.host,
-            configuration.application.port
+            configuration.application.host, configuration.application.port
         );
 
         let listener = TcpListener::bind(&address)?;
         let port = listener.local_addr().unwrap().port();
         let server = run(listener, connection_pool, email_client)?;
 
-        Ok(Self { port, server})
+        Ok(Self { port, server })
     }
 
     pub fn port(&self) -> u16 {
