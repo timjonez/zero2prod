@@ -1,8 +1,8 @@
 use crate::domain::{NewSubscriber, SubscriberEmail, SubscriberName};
+use crate::email_client::EmailClient;
 use actix_web::{web, HttpResponse};
 use sqlx::PgPool;
 use uuid::Uuid;
-use crate::email_client::EmailClient;
 
 #[derive(serde::Deserialize)]
 pub struct SubscribeForm {
@@ -42,12 +42,14 @@ pub async fn subscribe(
         return HttpResponse::InternalServerError().finish();
     }
 
+    let confirmation_link = "https://example.com/subscription/confirm";
+
     if email_client
         .send_email(
             new_subscriber.email,
             "Welcome",
-            "Welcome to the newsletter",
-            "Welcome to the newsletter",
+            &format!("Welcome to our newsletter. Please <a href=\"{confirmation_link}\">confirm</a> your subscription"),
+            &format!("Welcome to our newsletter. Please confirm your subscription: {confirmation_link}"),
         )
         .await
         .is_err()
