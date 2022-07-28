@@ -3,7 +3,7 @@ use wiremock::matchers::{method, path};
 use wiremock::{Mock, ResponseTemplate};
 
 #[tokio::test]
-async fn subscribe_returns_200_valid_data() {
+async fn subscribe_returns_200_for_valid_data() {
     let app = spawn_app().await;
 
     let body = "name=test&email=test%40test.com";
@@ -17,6 +17,21 @@ async fn subscribe_returns_200_valid_data() {
     let response = app.post_subscriptions(body.into()).await;
 
     assert_eq!(200, response.status().as_u16());
+}
+
+#[tokio::test]
+async fn subscribe_persists_new_subscriber() {
+    let app = spawn_app().await;
+    let body = "name=test&email=test%40test.com";
+
+    Mock::given(path("/email"))
+        .and(method("POST"))
+        .respond_with(ResponseTemplate::new(200))
+        .mount(&app.email_server)
+        .await;
+
+    app.post_subscriptions(body.into()).await;
+
     let saved = sqlx::query!("SELECT email, name FROM subscriptions",)
         .fetch_one(&app.db_pool)
         .await
@@ -101,7 +116,7 @@ async fn subscribe_sends_confirmation_email_with_link() {
             .links(s)
             .filter(|l| *l.kind() == linkify::LinkKind::Url)
             .collect();
-            assert_eq!(links.len(), 1);
+        assert_eq!(links.len(), 1);
         links[0].as_str().to_owned()
     };
 
