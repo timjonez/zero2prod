@@ -1,9 +1,9 @@
 use crate::domain::{NewSubscriber, SubscriberEmail, SubscriberName};
 use crate::email_client::EmailClient;
+use crate::startup::ApplicationBaseUrl;
 use actix_web::{web, HttpResponse};
 use sqlx::PgPool;
 use uuid::Uuid;
-use crate::startup::ApplicationBaseUrl;
 
 #[derive(serde::Deserialize)]
 pub struct SubscribeForm {
