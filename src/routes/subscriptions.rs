@@ -1,13 +1,13 @@
 use crate::domain::{NewSubscriber, SubscriberEmail, SubscriberName};
 use crate::email_client::EmailClient;
 use crate::startup::ApplicationBaseUrl;
+use actix_web::http::StatusCode;
 use actix_web::{web, HttpResponse, ResponseError};
+use anyhow::Context;
 use rand::distributions::Alphanumeric;
 use rand::{thread_rng, Rng};
 use sqlx::{PgPool, Postgres, Transaction};
 use uuid::Uuid;
-use actix_web::http::StatusCode;
-use anyhow::Context;
 
 #[derive(thiserror::Error)]
 pub enum SubscribeError {
@@ -95,7 +95,10 @@ pub async fn subscribe(
 ) -> Result<HttpResponse, SubscribeError> {
     let new_subscriber = form.0.try_into().map_err(SubscribeError::ValidationError)?;
 
-    let mut transaction = pool.begin().await.context("Failed to acquire a postgres connection from the pool")?;
+    let mut transaction = pool
+        .begin()
+        .await
+        .context("Failed to acquire a postgres connection from the pool")?;
 
     let subscriber_id = insert_subscriber(&mut transaction, &new_subscriber)
         .await
@@ -106,7 +109,10 @@ pub async fn subscribe(
         .await
         .context("Failed to store the confirmation token for a new subscriber")?;
 
-    transaction.commit().await.context("Failed to commit SQL transaction to store new subscriber")?;
+    transaction
+        .commit()
+        .await
+        .context("Failed to commit SQL transaction to store new subscriber")?;
 
     send_confirmation_email(
         &email_client,
@@ -188,7 +194,10 @@ pub async fn store_token(
     Ok(())
 }
 
-fn error_chain_fmt(e: &impl std::error::Error, f: &mut std::fmt::Formatter<'_>) -> std::fmt::Result {
+fn error_chain_fmt(
+    e: &impl std::error::Error,
+    f: &mut std::fmt::Formatter<'_>,
+) -> std::fmt::Result {
     writeln!(f, "{}\n", e)?;
     let mut current = e.source();
     while let Some(cause) = current {
